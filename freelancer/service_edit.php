@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_service'])) {
 }
 
 // ── Handle add availability slots ──
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_slots']) && $isEdit && $isScheduled) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_slots']) && $isEdit) {
     $slotDate = trim($_POST['slot_date'] ?? '');
     $slotTimes = $_POST['slot_times'] ?? [];
 
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_slots']) && $isEd
 }
 
 // ── Handle remove a slot ──
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_slot']) && $isEdit && $isScheduled) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_slot']) && $isEdit) {
     $slotId = (int)($_POST['slot_id'] ?? 0);
     if ($slotId) {
         $pdo->prepare('DELETE FROM service_availability WHERE id = ? AND service_id = ? AND is_booked = 0')
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_slot']) && $is
 
 // ── Fetch existing slots for this service ──
 $slots = [];
-if ($isEdit && $isScheduled) {
+if ($isEdit) {
     $stmt = $pdo->prepare('SELECT id, available_date, slot_time, is_booked FROM service_availability WHERE service_id = ? AND available_date >= CURDATE() ORDER BY available_date, slot_time');
     $stmt->execute([$id]);
     $slots = $stmt->fetchAll();
@@ -170,7 +170,7 @@ require_once __DIR__ . '/../includes/header.php';
         <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Update' : 'Create' ?> Service</button>
     </form>
 
-    <?php if ($isEdit && $isScheduled): ?>
+    <?php if ($isEdit): ?>
     <!-- ── Availability Section ── -->
     <div class="card form-card" style="margin-top:2rem;">
         <h2 class="form-section-title">Availability &mdash; add dates &amp; time slots</h2>

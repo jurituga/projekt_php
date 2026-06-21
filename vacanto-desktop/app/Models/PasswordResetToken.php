@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class PasswordResetToken extends Model
+{
+    public $timestamps = false;
+
+    protected $fillable = [
+        'user_id',
+        'token',
+        'expires_at',
+        'used',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+            'used' => 'boolean',
+            'created_at' => 'datetime',
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function isValid(): bool
+    {
+        return ! $this->used && $this->expires_at->isFuture();
+    }
+}

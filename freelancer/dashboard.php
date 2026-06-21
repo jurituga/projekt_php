@@ -171,12 +171,10 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
     </section>
 
-    <?php if ($isScheduled): ?>
     <section class="card" style="margin-bottom:1.5rem">
-        <p class="muted">Manage your availability dates and times from each service's edit page.</p>
+        <p class="muted">Manage your services and add the dates and times you are free from each service's edit page.</p>
         <a href="<?= BASE_URL ?>/freelancer/services.php" class="btn btn-primary" style="margin-top:.75rem">Go to My Services</a>
     </section>
-    <?php endif; ?>
 
     <div class="actions">
         <a href="<?= BASE_URL ?>/freelancer/profile.php" class="btn btn-secondary">Edit Profile</a>

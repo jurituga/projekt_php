@@ -50,6 +50,7 @@ if (!isset($pageTitle)) {
                         <a href="<?= BASE_URL ?>/freelancer/services.php" class="nav-link">My Services</a>
                     <?php else: ?>
                         <a href="<?= BASE_URL ?>/user/dashboard.php" class="nav-link">Dashboard</a>
+                        <a href="<?= BASE_URL ?>/user/cvs.php" class="nav-link">My CVs</a>
                     <?php endif; ?>
 
                     <?php if ($role !== ROLE_ADMIN): ?>
