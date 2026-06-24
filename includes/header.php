@@ -39,7 +39,15 @@ if (!isset($pageTitle)) {
 
             <div class="nav-actions">
                 <?php if (isLoggedIn()): ?>
-                    <?php $role = currentUserRole(); ?>
+                    <?php
+                    $role = currentUserRole();
+                    $__notifUnread = unreadNotificationCount();
+                    ?>
+                    <a href="<?= BASE_URL ?>/notifications/index.php" class="nav-link nav-messages">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="nav-label">Notifications</span>
+                        <?php if ($__notifUnread > 0): ?><span class="msg-badge" id="notifBadge"><?= $__notifUnread ?></span><?php else: ?><span class="msg-badge" id="notifBadge" style="display:none"></span><?php endif; ?>
+                    </a>
                     <?php if ($role === ROLE_ADMIN): ?>
                         <a href="<?= BASE_URL ?>/admin/index.php" class="nav-link">Admin Panel</a>
                     <?php elseif ($role === ROLE_COMPANY): ?>

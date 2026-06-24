@@ -36,6 +36,7 @@
                         @if($cv->is_default)
                             <span class="status status-published" style="font-size:.7rem">Default</span>
                         @endif
+                        <a href="{{ route('cvs.download', $cv) }}" class="btn btn-small" target="_blank" rel="noopener">Download</a>
                     </li>
                 @endforeach
             </ul>

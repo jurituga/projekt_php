@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\NativeViewCache;
 use Native\Desktop\Facades\Window;
 use Native\Desktop\Contracts\ProvidesPhpIni;
 
@@ -13,6 +14,8 @@ class NativeAppServiceProvider implements ProvidesPhpIni
      */
     public function boot(): void
     {
+        NativeViewCache::refreshIfStale();
+
         Window::open()
             ->title('Vacanto')
             ->width(1280)

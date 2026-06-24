@@ -32,7 +32,7 @@
                         <td><span class="status status-{{ $app->status }}">{{ $app->status }}</span></td>
                         <td>
                             @if($app->cv)
-                                <a href="{{ route('cvs.download', $app->cv) }}">Download</a>
+                                <a href="{{ route('cvs.download', $app->cv) }}" target="_blank" rel="noopener">Download</a>
                             @else
                                 —
                             @endif

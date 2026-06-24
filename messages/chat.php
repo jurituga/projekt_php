@@ -57,6 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $pdo->prepare('INSERT INTO messages (conversation_id, sender_id, body) VALUES (?, ?, ?)')->execute([$convId, $userId, $body]);
         $pdo->prepare('UPDATE conversations SET updated_at = NOW() WHERE id = ?')->execute([$convId]);
+        $senderName = $_SESSION['user_name'] ?? 'Someone';
+        createNotification(
+            $otherId,
+            'New message',
+            $senderName . ' sent you a message.',
+            BASE_URL . '/messages/chat.php?with=' . $userId,
+            'message'
+        );
         // Redirect to prevent resubmission
         header('Location: ' . BASE_URL . '/messages/chat.php?with=' . $otherId);
         exit;

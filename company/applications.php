@@ -53,7 +53,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><?= e($app['applicant_name']) ?></td>
                         <td><?= e($app['applicant_email']) ?></td>
                         <td><span class="status status-<?= e($app['status']) ?>"><?= e($app['status']) ?></span></td>
-                        <td><?php if ($app['cv_id']): ?><a href="<?= BASE_URL ?>/download_cv.php?id=<?= (int)$app['cv_id'] ?>">Download</a><?php else: ?>—<?php endif; ?></td>
+                        <td><?php if ($app['cv_id']): ?><a href="<?= BASE_URL ?>/download_cv.php?id=<?= (int)$app['cv_id'] ?>" target="_blank" rel="noopener">Download</a><?php else: ?>—<?php endif; ?></td>
                         <td><?= date('M j, Y', strtotime($app['created_at'])) ?></td>
                         <td>
                             <?php if ($app['status'] === APPLICATION_STATUS_PENDING || $app['status'] === APPLICATION_STATUS_VIEWED): ?>

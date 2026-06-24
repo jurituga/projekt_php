@@ -43,7 +43,7 @@
                         <td>{{ $cv->is_default ? 'Yes' : 'No' }}</td>
                         <td>{{ $cv->created_at?->format('M j, Y') ?? '—' }}</td>
                         <td>
-                            <a href="{{ route('cvs.download', $cv) }}" class="btn btn-small">Download</a>
+                            <a href="{{ route('cvs.download', $cv) }}" class="btn btn-small" target="_blank" rel="noopener">Download</a>
                             @if(!$cv->is_default)
                                 <form method="POST" action="{{ route('user.cvs.default', $cv) }}" style="display:inline">
                                     @csrf

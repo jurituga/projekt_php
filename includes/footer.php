@@ -42,6 +42,28 @@
     </div>
 </footer>
 <script src="<?= BASE_URL ?>/assets/js/main.js"></script>
+<?php if (isLoggedIn()): ?>
+<script>
+(function() {
+    setInterval(function() {
+        fetch('<?= BASE_URL ?>/notifications/poll.php')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var badge = document.getElementById('notifBadge');
+                if (!badge) return;
+                if (data.unread_total > 0) {
+                    badge.textContent = data.unread_total;
+                    badge.style.display = 'inline-flex';
+                } else {
+                    badge.textContent = '';
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function() {});
+    }, 15000);
+})();
+</script>
+<?php endif; ?>
 <?php if (isLoggedIn() && currentUserRole() !== ROLE_ADMIN): ?>
 <script>
 (function() {

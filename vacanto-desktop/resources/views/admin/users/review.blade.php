@@ -41,11 +41,14 @@
             <h3 style="margin-top:1.25rem;">Verification &amp; trust</h3>
             <table class="data-table">
                 <tr><th>Business Registration No.</th><td>{{ $company->business_registration_number ?: '—' }}</td></tr>
-                <tr><th>Tax ID / VAT</th><td>{{ $company->tax_id_vat ?: '—' }}</td></tr>
-                <tr><th>Government ID reference</th><td>{{ $company->government_id_ref ?: '—' }}</td></tr>
                 <tr>
-                    <th>Government ID (upload)</th>
-                    <td><x-admin-document :filename="$company->government_id_path" type="gov" /></td>
+                    <th>Business registration document</th>
+                    <td><x-admin-document :filename="$company->resolvedBusinessRegistrationDocumentPath()" type="gov" label="Business registration" /></td>
+                </tr>
+                <tr><th>Tax ID / VAT</th><td>{{ $company->tax_id_vat ?: '—' }}</td></tr>
+                <tr>
+                    <th>Government ID document</th>
+                    <td><x-admin-document :filename="$company->government_id_path" type="gov" label="Government ID" /></td>
                 </tr>
             </table>
         </div>

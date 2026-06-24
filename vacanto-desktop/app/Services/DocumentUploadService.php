@@ -51,6 +51,21 @@ class DocumentUploadService
 
     public function absolutePath(string $diskPath, string $filename): string
     {
-        return Storage::disk('vacanto')->path($diskPath.'/'.$filename);
+        $relative = trim($diskPath, '/').'/'.ltrim($filename, '/');
+        $primary = Storage::disk('vacanto')->path($relative);
+
+        if (is_file($primary)) {
+            return $primary;
+        }
+
+        $nativeRoot = config('nativephp-internal.storage_path');
+        if ($nativeRoot) {
+            $alternate = rtrim($nativeRoot, '/').'/app/'.$relative;
+            if (is_file($alternate)) {
+                return $alternate;
+            }
+        }
+
+        return $primary;
     }
 }

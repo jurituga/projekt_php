@@ -11,6 +11,7 @@ session_start();
 
 require_once __DIR__ . '/constants.php';
 require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/../includes/notifications.php';
 
 // Composer autoloader (for Stripe etc.)
 $autoload = __DIR__ . '/../vendor/autoload.php';

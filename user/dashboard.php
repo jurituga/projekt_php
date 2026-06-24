@@ -33,6 +33,37 @@ $stmt = $pdo->prepare("
 $stmt->execute([$userId]);
 $serviceRequests = $stmt->fetchAll();
 
+$stmt = $pdo->prepare('SELECT id, file_name, is_default, created_at FROM cvs WHERE user_id = ? ORDER BY is_default DESC, created_at DESC');
+$stmt->execute([$userId]);
+$cvs = $stmt->fetchAll();
+
+$cvUploadError = '';
+$cvUploadSuccess = isset($_GET['cv_uploaded']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dashboard_cv_upload'])) {
+    if (empty($_FILES['cv_file']['name'])) {
+        $cvUploadError = 'Please select a PDF file.';
+    } elseif ($_FILES['cv_file']['error'] !== UPLOAD_ERR_OK) {
+        $cvUploadError = 'Upload failed. Try again.';
+    } elseif ($_FILES['cv_file']['size'] > UPLOAD_MAX_CV_SIZE) {
+        $cvUploadError = 'File too large (max 5MB).';
+    } elseif (!in_array($_FILES['cv_file']['type'], ALLOWED_CV_TYPES, true)) {
+        $cvUploadError = 'Only PDF files are allowed.';
+    } else {
+        $ext = pathinfo($_FILES['cv_file']['name'], PATHINFO_EXTENSION) ?: 'pdf';
+        $filename = 'cv_' . $userId . '_' . time() . '.' . $ext;
+        $filepath = UPLOAD_PATH_CV . $filename;
+        if (move_uploaded_file($_FILES['cv_file']['tmp_name'], $filepath)) {
+            $isDefault = empty($cvs) ? 1 : 0;
+            $pdo->prepare('INSERT INTO cvs (user_id, file_name, file_path, is_default) VALUES (?, ?, ?, ?)')
+                ->execute([$userId, $_FILES['cv_file']['name'], $filename, $isDefault]);
+            header('Location: ' . BASE_URL . '/user/dashboard.php?cv_uploaded=1');
+            exit;
+        }
+        $cvUploadError = 'Could not save file.';
+    }
+}
+
 $pageTitle = 'My Dashboard';
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -42,6 +73,44 @@ require_once __DIR__ . '/../includes/header.php';
         <h1>My Dashboard</h1>
         <p class="muted">Welcome back, <?= e($_SESSION['user_name']) ?>.</p>
     </div>
+
+    <section class="card" style="margin-bottom:1.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+            <h2 style="margin:0">My CVs</h2>
+            <a href="<?= BASE_URL ?>/user/cvs.php" class="btn btn-ghost btn-sm">Manage CVs</a>
+        </div>
+        <?php if ($cvUploadSuccess): ?>
+            <div class="alert alert-success" style="margin-bottom:1rem">CV uploaded successfully.</div>
+        <?php endif; ?>
+        <?php if ($cvUploadError): ?>
+            <div class="alert alert-error" style="margin-bottom:1rem"><?= e($cvUploadError) ?></div>
+        <?php endif; ?>
+        <?php if (empty($cvs)): ?>
+            <p class="muted" style="margin-bottom:1rem">Upload a PDF CV to attach when applying for jobs.</p>
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="dashboard_cv_upload" value="1">
+                <div class="form-group" style="margin-bottom:.75rem">
+                    <input type="file" name="cv_file" accept="application/pdf" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Upload CV</button>
+            </form>
+        <?php else: ?>
+            <ul class="cv-summary-list">
+                <?php foreach (array_slice($cvs, 0, 3) as $cv): ?>
+                    <li>
+                        <span><?= e($cv['file_name']) ?></span>
+                        <?php if ($cv['is_default']): ?>
+                            <span class="status status-published" style="font-size:.7rem">Default</span>
+                        <?php endif; ?>
+                        <a href="<?= BASE_URL ?>/download_cv.php?id=<?= (int)$cv['id'] ?>" class="btn btn-small" target="_blank" rel="noopener">Download</a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php if (count($cvs) > 3): ?>
+                <p class="muted" style="margin-top:.5rem;font-size:.85rem">+ <?= count($cvs) - 3 ?> more</p>
+            <?php endif; ?>
+        <?php endif; ?>
+    </section>
 
     <section class="card" style="margin-bottom:1.5rem">
         <h2>My Applications</h2>

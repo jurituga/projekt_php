@@ -55,8 +55,8 @@ class RegisterController extends Controller
             $rules['company_phone'] = ['nullable', 'string', 'max:50'];
             $rules['company_business_registration'] = ['nullable', 'string', 'max:100'];
             $rules['company_tax_id'] = ['nullable', 'string', 'max:100'];
-            $rules['company_government_id_file'] = ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,gif'];
-            $rules['company_business_reg_file'] = ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,gif'];
+            $rules['company_government_id_file'] = ['required', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,gif'];
+            $rules['company_business_reg_file'] = ['required', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,gif'];
         }
 
         if ($role === UserRole::Freelancer) {
@@ -69,7 +69,12 @@ class RegisterController extends Controller
             $rules['freelancer_certification_file'] = ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,gif'];
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'company_government_id_file.required' => 'Please upload a government ID document.',
+            'company_business_reg_file.required' => 'Please upload your business registration document.',
+            'company_government_id_file.mimes' => 'Government ID must be a PDF or image (JPEG, PNG, GIF).',
+            'company_business_reg_file.mimes' => 'Business registration document must be a PDF or image (JPEG, PNG, GIF).',
+        ]);
 
         try {
             $companyGovIdPath = null;
@@ -129,7 +134,7 @@ class RegisterController extends Controller
                     'phone' => $request->input('company_phone'),
                     'business_registration_number' => $request->input('company_business_registration'),
                     'tax_id_vat' => $request->input('company_tax_id'),
-                    'government_id_ref' => $companyBusinessRegPath,
+                    'business_registration_document_path' => $companyBusinessRegPath,
                     'government_id_path' => $companyGovIdPath,
                 ]);
             } elseif ($role === UserRole::Freelancer) {

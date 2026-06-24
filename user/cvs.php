@@ -117,7 +117,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><?= $cv['is_default'] ? 'Yes' : 'No' ?></td>
                         <td><?= date('M j, Y', strtotime($cv['created_at'])) ?></td>
                         <td>
-                            <a href="<?= BASE_URL ?>/download_cv.php?id=<?= (int)$cv['id'] ?>" class="btn btn-small">Download</a>
+                            <a href="<?= BASE_URL ?>/download_cv.php?id=<?= (int)$cv['id'] ?>" class="btn btn-small" target="_blank" rel="noopener">Download</a>
                             <?php if (!$cv['is_default']): ?>
                                 <form method="post" style="display:inline">
                                     <input type="hidden" name="set_default" value="1">

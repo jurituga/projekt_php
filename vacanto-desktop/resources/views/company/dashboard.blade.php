@@ -44,7 +44,7 @@
                             <td>
                                 {{ $app->user->name }}
                                 @if($app->cv)
-                                    <br><a href="{{ route('cvs.download', $app->cv) }}" class="btn btn-small">CV</a>
+                                    <br><a href="{{ route('cvs.download', $app->cv) }}" class="btn btn-small" target="_blank" rel="noopener">CV</a>
                                 @endif
                             </td>
                             <td><span class="status status-{{ $app->status }}">{{ $app->status }}</span></td>

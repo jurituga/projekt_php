@@ -44,10 +44,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply']) && $canApply
             $cvId = null;
         }
     }
-    $stmt = $pdo->prepare('INSERT INTO applications (job_id, user_id, cv_id, cover_letter, status) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$id, currentUserId(), $cvId ?: null, $coverLetter, APPLICATION_STATUS_PENDING]);
-    $applySuccess = true;
-    $alreadyApplied = true;
+
+    if (!$cvId && !empty($_FILES['cv_file']['name'])) {
+        if ($_FILES['cv_file']['error'] !== UPLOAD_ERR_OK) {
+            $applyError = 'CV upload failed. Try again.';
+        } elseif ($_FILES['cv_file']['size'] > UPLOAD_MAX_CV_SIZE) {
+            $applyError = 'CV file too large (max 5MB).';
+        } elseif (!in_array($_FILES['cv_file']['type'], ALLOWED_CV_TYPES, true)) {
+            $applyError = 'Only PDF files are allowed for CV.';
+        } else {
+            $userId = currentUserId();
+            $ext = pathinfo($_FILES['cv_file']['name'], PATHINFO_EXTENSION) ?: 'pdf';
+            $filename = 'cv_' . $userId . '_' . time() . '.' . $ext;
+            $filepath = UPLOAD_PATH_CV . $filename;
+            if (move_uploaded_file($_FILES['cv_file']['tmp_name'], $filepath)) {
+                $stmt = $pdo->prepare('SELECT COUNT(*) FROM cvs WHERE user_id = ?');
+                $stmt->execute([$userId]);
+                $isDefault = ((int) $stmt->fetchColumn()) === 0 ? 1 : 0;
+                $pdo->prepare('INSERT INTO cvs (user_id, file_name, file_path, is_default) VALUES (?, ?, ?, ?)')
+                    ->execute([$userId, $_FILES['cv_file']['name'], $filename, $isDefault]);
+                $cvId = (int) $pdo->lastInsertId();
+            } else {
+                $applyError = 'Could not save CV file.';
+            }
+        }
+    }
+
+    if ($applyError === '') {
+        $stmt = $pdo->prepare('INSERT INTO applications (job_id, user_id, cv_id, cover_letter, status) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$id, currentUserId(), $cvId ?: null, $coverLetter, APPLICATION_STATUS_PENDING]);
+        $applicantName = $_SESSION['user_name'] ?? 'Someone';
+        createNotification(
+            (int) $job['company_user_id'],
+            'New job application',
+            $applicantName . ' applied for "' . $job['title'] . '".',
+            BASE_URL . '/company/applications.php',
+            'application'
+        );
+        $applySuccess = true;
+        $alreadyApplied = true;
+    }
 }
 
 $userCvs = [];
@@ -108,7 +144,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php if ($applyError): ?>
                     <div class="alert alert-error"><?= e($applyError) ?></div>
                 <?php endif; ?>
-                <form method="post" action="">
+                <form method="post" action="" enctype="multipart/form-data">
                     <input type="hidden" name="apply" value="1">
                     <?php if (!empty($userCvs)): ?>
                         <div class="form-group">
@@ -119,8 +155,16 @@ require_once __DIR__ . '/includes/header.php';
                                     <option value="<?= (int)$cv['id'] ?>" <?= $cv['is_default'] ? 'selected' : '' ?>><?= e($cv['file_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <span class="form-hint">Or upload a new PDF below.</span>
                         </div>
                     <?php endif; ?>
+                    <div class="form-group">
+                        <label for="cv_file"><?= empty($userCvs) ? 'Upload CV (PDF, max 5MB)' : 'Upload new CV (optional)' ?></label>
+                        <input type="file" id="cv_file" name="cv_file" accept="application/pdf"<?= empty($userCvs) ? '' : '' ?>>
+                        <?php if (empty($userCvs)): ?>
+                            <span class="form-hint">You can also manage CVs from <a href="<?= BASE_URL ?>/user/cvs.php">My CVs</a>.</span>
+                        <?php endif; ?>
+                    </div>
                     <div class="form-group">
                         <label for="cover_letter">Cover letter</label>
                         <textarea id="cover_letter" name="cover_letter" rows="5" placeholder="Tell the employer why you're a great fit..."></textarea>

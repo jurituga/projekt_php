@@ -59,16 +59,24 @@
                     <input type="text" id="company_business_registration" name="company_business_registration" value="{{ old('company_business_registration') }}">
                 </div>
                 <div class="form-group">
-                    <label for="company_business_reg_file">Business registration document (upload)</label>
-                    <input type="file" id="company_business_reg_file" name="company_business_reg_file" accept=".pdf,.jpg,.jpeg,.png,.gif">
+                    <label for="company_business_reg_file">Business registration document (upload) <span class="required">*</span></label>
+                    <input type="file" id="company_business_reg_file" name="company_business_reg_file" accept=".pdf,.jpg,.jpeg,.png,.gif,application/pdf,image/jpeg,image/png,image/gif">
+                    <span class="form-hint">PDF or image (JPEG, PNG, GIF). Max 5MB.</span>
+                    @error('company_business_reg_file')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="form-group">
                     <label for="company_tax_id">Tax ID / VAT number</label>
                     <input type="text" id="company_tax_id" name="company_tax_id" value="{{ old('company_tax_id') }}">
                 </div>
                 <div class="form-group">
-                    <label for="company_government_id_file">Government ID (upload)</label>
-                    <input type="file" id="company_government_id_file" name="company_government_id_file" accept=".pdf,.jpg,.jpeg,.png,.gif">
+                    <label for="company_government_id_file">Government ID (upload) <span class="required">*</span></label>
+                    <input type="file" id="company_government_id_file" name="company_government_id_file" accept=".pdf,.jpg,.jpeg,.png,.gif,application/pdf,image/jpeg,image/png,image/gif">
+                    <span class="form-hint">PDF or image (JPEG, PNG, GIF). Max 5MB.</span>
+                    @error('company_government_id_file')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
@@ -132,6 +140,8 @@
     var freelancerFields = document.getElementById('freelancer_fields');
     var companyName = document.getElementById('company_name');
     var companyIndustry = document.getElementById('company_industry');
+    var companyGovIdFile = document.getElementById('company_government_id_file');
+    var companyBusinessRegFile = document.getElementById('company_business_reg_file');
     var freelancerBio = document.getElementById('freelancer_bio');
     var freelancerSkills = document.getElementById('freelancer_skills');
 
@@ -142,6 +152,8 @@
             freelancerFields.style.display = 'none';
             companyName.required = true;
             companyIndustry.required = true;
+            companyGovIdFile.required = true;
+            companyBusinessRegFile.required = true;
             freelancerBio.required = false;
             freelancerSkills.required = false;
         } else if (v === 'freelancer') {
@@ -149,6 +161,8 @@
             freelancerFields.style.display = 'block';
             companyName.required = false;
             companyIndustry.required = false;
+            companyGovIdFile.required = false;
+            companyBusinessRegFile.required = false;
             freelancerBio.required = true;
             freelancerSkills.required = true;
         } else {
@@ -156,6 +170,8 @@
             freelancerFields.style.display = 'none';
             companyName.required = false;
             companyIndustry.required = false;
+            companyGovIdFile.required = false;
+            companyBusinessRegFile.required = false;
             freelancerBio.required = false;
             freelancerSkills.required = false;
         }
